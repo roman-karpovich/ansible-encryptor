@@ -41,7 +41,7 @@ def main(prefix, file_path):
                 lines.pop(i)
 
             decrypted_data = vault.decrypt(encrypted_data)
-            lines.insert(i, '{}: {}'.format(variable_name, decrypted_data))
+            lines.insert(i, '{}: {}\n'.format(variable_name, decrypted_data))
 
             i += 1
 

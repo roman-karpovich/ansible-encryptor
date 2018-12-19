@@ -112,7 +112,9 @@ def main(prefix):
     encrypted_variables = config.get('encrypted_variables')
     assert encrypted_variables, 'No variables to encrypt'
 
-    variables_regexp = r'^(?P<name>{}):'.format('|'.join(encrypted_variables))
+    vault = VaultLib(secrets=[['default', Secret()]])
+
+    variables_regexp = r'^(?P<name>{}): (?P<data>.*)'.format('|'.join(encrypted_variables))
 
     # for every file having variables
     for var_file in get_variables_files(prefix):
@@ -152,7 +154,8 @@ def main(prefix):
 
                 lines.insert(i, '{}: !vault |\n'.format(variable_name))
 
-                encrypted_data = VaultLib().encrypt(''.join(variable_lines), Secret(), 'default')
+                variable_data = re.match(variables_regexp, ''.join(variable_lines)).group(2)
+                encrypted_data = vault.encrypt(''.join(variable_data))
                 for j, encrypted_line in enumerate(encrypted_data.splitlines(True)):
                     lines.insert(i+j+1, ' '*6 + encrypted_line)
 

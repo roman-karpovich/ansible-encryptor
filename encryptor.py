@@ -122,10 +122,7 @@ def main(prefix):
 
         with open(var_file, 'r') as stream:
             # load file
-            # decrypt if required (specify flag to ask vault secret)  # todo
             lines = stream.readlines()
-            # stream.seek(0)
-            # data = yaml.load(stream)
             assert lines, 'empty file: {}'.format(var_file)
 
             i = 0
@@ -138,9 +135,6 @@ def main(prefix):
                     continue
 
                 variable_name = match.group(1)
-                if variable_name not in encrypted_variables:
-                    i += 1
-                    continue
 
                 is_encrypted = '!vault' in line
                 if is_encrypted:

@@ -19,7 +19,7 @@ def main(prefix, file_path):
 
     vault = VaultLib(secrets=[['default', Secret()]])
 
-    encrypted_variable_regexp = r'^(?P<name>{}): !vault \|'.format('|'.join(encrypted_variables))
+    encrypted_variable_regexp = r'^(?P<name>\w+): !vault \|'
 
     with open(os.path.join(prefix, file_path), 'r') as encrypted_file:
         lines = encrypted_file.readlines()

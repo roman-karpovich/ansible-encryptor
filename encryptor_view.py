@@ -40,7 +40,7 @@ def main(prefix, file_path):
             for j in range(len(variable_lines)):
                 lines.pop(i)
 
-            decrypted_data = vault.decrypt(encrypted_data)
+            decrypted_data = vault.decrypt(encrypted_data).decode()
             lines.insert(i, '{}: {}\n'.format(variable_name, decrypted_data))
 
             i += 1

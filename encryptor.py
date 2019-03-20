@@ -39,13 +39,15 @@ def load_config(prefix):
 
 def get_variables_folders():
     """
-    no need to encrypt defaults & another yaml files, so lookup only inside default directories & common role vars
+    no need to encrypt defaults & another yaml files, so lookup only inside default directories
+    & common/ansible-variables role vars
     """
     return [
         'env_vars',
         'group_vars',
         'host_vars',
-        'roles/common/vars'
+        'roles/common/vars',
+        'roles/ansible-variables/vars',
     ]
 
 
@@ -55,10 +57,6 @@ def get_variables_files(prefix):
             for inner_file in files:
                 if inner_file.endswith(".yml"):  # todo: support multiple extensions?
                     yield os.path.join(root, inner_file)
-
-
-def encrypt_variable(value):
-    return 'encrypted: {}'.format(value)
 
 
 def get_variable_lines(lines, start_index):
@@ -102,7 +100,7 @@ class Secret(object):
 
     @property
     def bytes(self):
-        return bytes(self.get_key())
+        return bytes(self.get_key().encode())
 
 
 def main(prefix):
@@ -151,7 +149,7 @@ def main(prefix):
                 variable_data = re.match(variables_regexp, ''.join(variable_lines)).group(2)
                 encrypted_data = vault.encrypt(''.join(variable_data))
                 for j, encrypted_line in enumerate(encrypted_data.splitlines(True)):
-                    lines.insert(i+j+1, ' '*6 + encrypted_line)
+                    lines.insert(i+j+1, ' '*6 + encrypted_line.decode())
 
                 updated = True
                 i += 1

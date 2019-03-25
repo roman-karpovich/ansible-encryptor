@@ -1,23 +1,13 @@
 #!/usr/bin/env python
 from __future__ import absolute_import, unicode_literals
 
-import io
 import os
 import re
 import sys
 from getpass import getpass
 
 import yaml
-import ruamel.yaml
 from ansible.parsing.vault import VaultLib
-
-
-def load_yaml():
-    pass
-
-
-def save():
-    pass
 
 
 def load_config(prefix):
@@ -162,6 +152,7 @@ def main(prefix):
 
 
 if __name__ == '__main__':
+    # todo: process args correctly
     if len(sys.argv) == 1:
         prefix_dir = '../ansible'
     else:

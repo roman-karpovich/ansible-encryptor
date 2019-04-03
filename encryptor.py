@@ -11,6 +11,11 @@ import yaml
 import ruamel.yaml
 from ansible.parsing.vault import VaultLib
 
+try:
+    import ConfigParser as configparser
+except ImportError:
+    import configparser
+
 
 def load_yaml():
     pass
@@ -105,6 +110,44 @@ class Secret(object):
         return bytes(self.get_key())
 
 
+class VaultSecret(Secret):
+    def __init__(self, ansible_root):
+        super(VaultSecret, self).__init__()
+
+        self.ansible_root = ansible_root
+
+    def _get_vault_location(self):
+        config = configparser.ConfigParser()
+        config.read(os.path.join(self.ansible_root, 'ansible.cfg'))
+        return config.get('defaults', 'vault_password_file')
+
+    def _read_vault(self):
+        vault_path = os.path.expanduser(self._get_vault_location())
+
+        if not os.path.exists(vault_path):
+            return None
+
+        with open(vault_path, 'r') as vault:
+            key = vault.read().replace('\n', '')
+
+        return key
+
+    def _write_vault(self, key):
+        vault_path = os.path.expanduser(self._get_vault_location())
+
+        with open(vault_path, 'w') as vault:
+            vault.write(key)
+
+    def load_key(self):
+        key = self._read_vault()
+        if key:
+            self.key = key
+        else:
+            # ask key from console
+            super(VaultSecret, self).load_key()
+            self._write_vault(self.key)
+
+
 def main(prefix):
     # load list of protected variables
     config = load_config(prefix)
@@ -112,7 +155,7 @@ def main(prefix):
     encrypted_variables = config.get('encrypted_variables')
     assert encrypted_variables, 'No variables to encrypt'
 
-    vault = VaultLib(secrets=[['default', Secret()]])
+    vault = VaultLib(secrets=[['default', VaultSecret(prefix)]])
 
     variables_regexp = r'^(?P<name>{}): (?P<data>.*)'.format('|'.join(encrypted_variables))
 

@@ -7,7 +7,7 @@ import sys
 
 from ansible.parsing.vault import VaultLib
 
-from encryptor import load_config, get_variable_lines, Secret
+from encryptor import load_config, get_variable_lines, VaultSecret
 
 
 def main(prefix, file_path):
@@ -17,7 +17,7 @@ def main(prefix, file_path):
     encrypted_variables = config.get('encrypted_variables')
     assert encrypted_variables, 'No variables to encrypt'
 
-    vault = VaultLib(secrets=[['default', Secret()]])
+    vault = VaultLib(secrets=[['default', VaultSecret(prefix)]])
 
     encrypted_variable_regexp = r'^(?P<name>\w+): !vault \|'
 

@@ -65,7 +65,7 @@ def get_variable_lines(lines, start_index):
             break
 
         line = lines[index]
-        if re.match(r'^\w+:', line):
+        if re.match(r'^(\w+:)|(#[ \w]+)', line):
             break
 
         variable_lines.append(line)

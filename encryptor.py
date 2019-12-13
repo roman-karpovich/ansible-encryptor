@@ -43,6 +43,8 @@ def get_variables_folders():
         'host_vars',
         'roles/common/vars',
         'roles/ansible-variables/vars',
+        'inventories',
+        'playbooks',
     ]
 
 

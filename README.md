@@ -104,8 +104,8 @@ python encryptor/encryptor_check.py ansible
 
 # Rotate every !vault block in each group's paths under that group's current vault_id.
 # Decrypts using any available vault password (ansible.cfg legacy + every group's file),
-# re-encrypts under the group's vault. Idempotent: blocks already labeled with the
-# group's vault_id are skipped.
+# re-encrypts under the group's vault. Idempotent: a same-label block is skipped
+# only when the current target password can decrypt it.
 python encryptor/encryptor_rotate.py ansible
 
 # Pass an explicit source vault when rotating to a fresh password file. Repeatable.
@@ -122,7 +122,7 @@ Typical migration flow for an environment moving off the shared legacy vault:
 4. Run `encryptor_check.py` to confirm coverage.
 5. Once every environment has its own vault file, the legacy `vault_password_file` in `ansible.cfg` can be removed or repointed.
 
-To rotate an already-v2 group's password to a fresh file (e.g. compromise response, key hygiene): generate the new file, point the group's `vault_password_file` at it, then run `encryptor_rotate.py --from-vault <path-to-old-file>`. Delete the old file once the rotation completes successfully.
+To rotate an already-v2 group's password to a fresh file (e.g. compromise response, key hygiene): generate the new file, point the group's `vault_password_file` at it, then run `encryptor_rotate.py --from-vault <path-to-old-file>`. Verify every updated block with the new password, rejection with the old password, and unchanged plaintext values. Keep the old password while any other repository or required historical revision still depends on it. Rekeying current files does not revoke access to old ciphertext in Git history or backups.
 
 ## Limitations
 
